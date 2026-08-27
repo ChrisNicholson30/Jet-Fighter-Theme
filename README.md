@@ -16,21 +16,30 @@ of what follows.
 
 ## Install
 
-**From the extension registry** — open the command palette, `zed: extensions`,
-search for *Jet Fighter*, install, then pick a variant in `theme selector`.
-
-**From source**
+One command. Run it to install, run it again to update — it is the same command
+either way, and it tells you which one it did.
 
 ```sh
-git clone https://github.com/chrisnicholson30/jet-fighter
-cd jet-fighter
-cp themes/jet-fighter.json ~/.config/zed/themes/
+curl -fsSL https://chrisnicholson30.github.io/Jet-Fighter-Theme/install.sh | sh
 ```
 
-The three variants appear in the theme selector on next load.
+Then pick a variant: `cmd-shift-p` → `theme selector`.
 
-**As a dev extension** — `zed: install dev extension`, then choose this
-directory.
+[`install.sh`](install.sh) is about a hundred lines and worth reading before you
+pipe it to a shell. It validates the download before writing anything, replaces
+the file atomically, never needs `sudo`, and takes `--check` (report only),
+`--uninstall`, and `JF_REF` to pin a git ref.
+
+<details>
+<summary>Other ways in</summary>
+
+**From the extension registry** — `zed: extensions`, search *Jet Fighter*.
+
+**By hand** — drop `themes/jet-fighter.json` into `~/.config/zed/themes/`.
+
+**As a dev extension** — `zed: install dev extension`, then choose this directory.
+
+</details>
 
 ---
 
@@ -276,6 +285,35 @@ One finding worth recording: the brief's contrast work never accounts for the
 but only 4.06:1 on the active line as originally specified. Since keywords sit on
 the active line constantly, the band's opacity was solved backwards from the
 keyword floor instead.
+
+---
+
+## The site
+
+<https://chrisnicholson30.github.io/Jet-Fighter-Theme/>
+
+Generated from `themes/jet-fighter.json` rather than authored alongside it.
+Every colour on the page is a CSS custom property lifted from the shipped
+theme, so the site cannot show a colour the theme does not contain — and
+switching variant repaints the entire document, not a preview pane. You browse
+the site *in* the theme.
+
+The code samples are highlighted by a tokeniser that emits **Zed capture
+names**, resolved through Zed's own longest-dotted-prefix rule
+(`site/src/highlight.mjs`). A theme site normally colours its samples with
+whatever highlighter the site happens to use, which means the screenshots show
+a different highlighter wearing the theme's colours. Here, if a capture falls
+back on the page, it falls back in the editor too.
+
+```sh
+npm run site:build    # regenerate site/dist
+npm run site:serve    # build and open locally
+npm run site:assets   # re-render the social card and icon set (needs Playwright)
+```
+
+Deployment is `.github/workflows/pages.yml`, which rebuilds on any push to
+`main` that touches the theme or the site, and fails first if the committed
+theme has drifted from `src/`.
 
 ---
 

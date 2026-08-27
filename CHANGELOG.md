@@ -44,6 +44,19 @@ First release. Three variants in one theme family.
   assumptions and re-run under three weightings.
 - `src/build.mjs --check` — fails if the committed JSON has drifted from source.
 
+### Site and install
+
+- `install.sh` — one idempotent command that installs and updates. Validates the
+  download before writing, replaces atomically, needs no `sudo`, and supports
+  `--check`, `--uninstall` and `JF_REF` for pinning.
+- A showcase site generated from the theme file itself, so its palette cannot
+  drift from what ships. Switching variant repaints the whole document.
+- Code samples highlighted through Zed's own longest-dotted-prefix capture
+  resolution rather than a generic web highlighter.
+- Vector rebuild of the mark (`site/src/mark.mjs`) with the gradient relocked to
+  `#38BDF8` / `#7C3AED` / `#A855F7`, plus a separate 16/32px reduction, a
+  single-colour version, and a 1280x640 social card.
+
 ### Notes
 
 - Comments hold slate-500's hue but re-derive lightness to clear 4.5:1. The
