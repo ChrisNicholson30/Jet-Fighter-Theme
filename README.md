@@ -308,8 +308,16 @@ back on the page, it falls back in the editor too.
 ```sh
 npm run site:build    # regenerate site/dist
 npm run site:serve    # build and open locally
-npm run site:assets   # re-render the social card and icon set (needs Playwright)
+npm run site:assets   # re-derive the logo, icons and social card (needs Playwright)
 ```
+
+The mark is the supplied artwork, vendored at
+`site/assets/brand/mark-source.jpg`. Everything the site shows is derived from
+it by `site/generate-assets.mjs`, which locates the ring by luminance and
+centres a square crop on it — so re-exporting the source at a different size
+does not silently shift the framing. Tab-sized icons take a tighter 72% crop,
+because at 16px the full badge loses the aircraft and only a framed-in delta
+and its plumes survive.
 
 Deployment is `.github/workflows/pages.yml`, which rebuilds on any push to
 `main` that touches the theme or the site, and fails first if the committed

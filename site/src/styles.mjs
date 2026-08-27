@@ -106,7 +106,7 @@ body > * { position: relative; z-index: 1; }
   padding: 1.05rem 0; border-bottom: var(--rule) solid var(--border-variant);
   transition: border-color var(--swap);
 }
-.top__mark { width: 34px; height: 34px; flex: none; }
+.top__mark { width: 34px; height: 34px; flex: none; border-radius: 50%; }
 .top__name { font-family: 'Saira Cond', sans-serif; font-weight: 800; font-size: 1.06rem; letter-spacing: .06em; text-transform: uppercase; }
 .top__spacer { flex: 1; }
 .top__link {
@@ -136,8 +136,13 @@ body > * { position: relative; z-index: 1; }
 .hero__lede { font-size: var(--step-1); max-width: 46ch; color: var(--text); font-weight: 300; }
 .hero__lede b { font-weight: 600; color: var(--accent); transition: color var(--swap); }
 
-.hero__art { position: relative; width: clamp(190px, 26vw, 310px); }
-.hero__art svg { filter: drop-shadow(0 0 46px color-mix(in srgb, var(--accent) 26%, transparent)); }
+.hero__art { position: relative; width: clamp(190px, 26vw, 310px); aspect-ratio: 1; }
+/* The mark is a badge on a black ground, so it is masked to its own circle —
+   without this the artwork's square corners read as a black box on Contrail. */
+.hero__art img {
+  width: 100%; height: 100%; border-radius: 50%;
+  box-shadow: 0 0 52px -6px color-mix(in srgb, var(--accent) 34%, transparent);
+}
 .hero__art::after {
   content: ''; position: absolute; inset: -6%; border-radius: 50%;
   border: var(--rule) dashed var(--border-variant); opacity: .55;

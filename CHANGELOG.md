@@ -53,9 +53,13 @@ First release. Three variants in one theme family.
   drift from what ships. Switching variant repaints the whole document.
 - Code samples highlighted through Zed's own longest-dotted-prefix capture
   resolution rather than a generic web highlighter.
-- Vector rebuild of the mark (`site/src/mark.mjs`) with the gradient relocked to
-  `#38BDF8` / `#7C3AED` / `#A855F7`, plus a separate 16/32px reduction, a
-  single-colour version, and a 1280x640 social card.
+- The supplied artwork is the mark, vendored at
+  `site/assets/brand/mark-source.jpg` and used for the logo, the favicons and
+  the social card. `site/generate-assets.mjs` finds the ring by luminance and
+  centres a square on it, so the crop is reproducible rather than hand-dragged.
+  Tab-sized icons take a 72% crop: at 16px the full badge loses the aircraft
+  altogether, and framing in on the delta and plumes is the only thing that
+  still reads.
 
 ### Notes
 

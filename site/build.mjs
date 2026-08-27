@@ -14,7 +14,6 @@ import { dirname, resolve } from 'node:path';
 import { contrast, over } from '../src/color.mjs';
 import { highlight, highlightLines } from './src/highlight.mjs';
 import { SAMPLES, DIFF_SAMPLE, TERMINAL_SESSION } from './src/samples.mjs';
-import { markSvg, faviconSvg, markMonoSvg } from './src/mark.mjs';
 import { BASE_CSS, FONT_CSS, slug } from './src/styles.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -306,8 +305,8 @@ function page() {
 <meta property="og:url" content="${SITE}">
 <meta property="og:image" content="${SITE}assets/social-card.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="alternate icon" href="assets/icon-32.png" sizes="32x32">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="canonical" href="${SITE}">
 <style>${FONT_CSS}${BASE_CSS}${variantCss()}${syntaxCss()}${rowVisibilityCss()}</style>
@@ -315,7 +314,7 @@ function page() {
 <body>
 
 <header class="top wrap">
-  <div class="top__mark">${faviconSvg({ id: 'nav' })}</div>
+  <img class="top__mark" src="assets/logo-96.webp" width="34" height="34" alt="" decoding="async">
   <span class="top__name">Jet&nbsp;Fighter</span>
   <span class="micro" style="border:1px solid var(--border-variant);padding:.1rem .45rem">v${pkg.version}</span>
   <span class="top__spacer"></span>
@@ -349,7 +348,11 @@ function page() {
           No sudo, nothing written until the download is validated.
         </p>
       </div>
-      <div class="hero__art rise" style="animation-delay:100ms">${markSvg({ id: 'hero', size: 310 })}</div>
+      <div class="hero__art rise" style="animation-delay:100ms">
+        <img src="assets/logo-640.webp" width="640" height="640"
+             alt="Jet Fighter — a stealth delta over a field of code lines, inside a cyan-to-violet ring"
+             fetchpriority="high" decoding="async">
+      </div>
     </div>
   </section>
 
