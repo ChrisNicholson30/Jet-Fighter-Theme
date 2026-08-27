@@ -1,0 +1,25 @@
+/* Proof corpus — CSS. Selectors, properties, values, at-rules, functions. */
+@import url("./tokens.css") layer(base);
+
+:root {
+  --jf-primary: #38bdf8;
+  --jf-accent: #a855f7;
+  --jf-ground: #0b0f14;
+}
+
+.annunciator[data-mode="insert"]::after {
+  content: "INSERT";
+  background: color-mix(in oklab, var(--jf-primary) 80%, transparent);
+  padding: 0.125rem 0.5rem;
+  border-radius: 2px;
+  transition: opacity 120ms ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 48rem) {
+  .cockpit > .hud:not(.muted) { color: var(--jf-accent); opacity: 0.92; }
+}
+
+@keyframes afterburner {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.4) saturate(1.2); }
+}

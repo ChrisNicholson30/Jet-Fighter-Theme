@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- Proof corpus — HTML. Tags, attributes, text, embedded script and style. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jet Fighter</title>
+    <style>
+      body { background: #0b0f14; color: #f8fafc; }
+    </style>
+  </head>
+  <body data-mode="normal">
+    <h1 class="callsign">JF&#8209;001</h1>
+    <p>Thrust at <strong>82%</strong>, ceiling <em>65,000 ft</em>.</p>
+    <script type="module">
+      const mode = document.body.dataset.mode ?? 'normal';
+      console.log(`mode: ${mode}`);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "jet-fighter-zed",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Jet Fighter — a Zed theme family: Afterburner, Stealth, Contrail.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node src/build.mjs",
+    "check:build": "node src/build.mjs --check",
+    "check:keys": "node scripts/key-coverage.mjs",
+    "check:contrast": "node scripts/contrast-gate.mjs",
+    "check:contrast-self-test": "node scripts/contrast-gate.mjs --self-test",
+    "check:provenance": "node scripts/provenance.mjs",
+    "check:power": "node scripts/power-model.mjs",
+    "test": "npm run check:build && npm run check:keys && npm run check:contrast && npm run check:contrast-self-test && npm run check:provenance && npm run check:power"
+  }
+}

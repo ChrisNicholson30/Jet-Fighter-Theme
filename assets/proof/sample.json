@@ -1,0 +1,9 @@
+{
+  "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
+  "name": "Jet Fighter",
+  "ceiling_ft": 65000,
+  "thrust": 0.82,
+  "armed": false,
+  "modes": ["normal", "insert", "visual"],
+  "telemetry": { "alt": null, "mach": 1.6e0, "heading": -180 }
+}

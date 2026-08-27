@@ -1,0 +1,17 @@
+diff --git a/src/airframe.rs b/src/airframe.rs
+index 8f2c1a4..b7e0d39 100644
+--- a/src/airframe.rs
++++ b/src/airframe.rs
+@@ -12,9 +12,11 @@ pub struct Airframe<'a> {
+     pub callsign: &'a str,
+-    pub thrust: f32,
++    pub thrust: f64,
++    telemetry: HashMap<String, f64>,
+ }
+ 
+ impl<'a> Airframe<'a> {
+     pub fn new(callsign: &'a str) -> Self {
+-        Self { callsign, thrust: 0.8 }
++        Self { callsign, thrust: 0.82, telemetry: HashMap::new() }
+     }
+ }

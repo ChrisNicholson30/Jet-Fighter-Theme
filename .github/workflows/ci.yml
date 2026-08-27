@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  gates:
+    name: Theme gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # No dependencies: every gate is plain Node with zero packages, so there
+      # is nothing to install and nothing to audit.
+      - name: Committed theme matches source
+        run: npm run check:build
+
+      - name: Key coverage — all 185 keys, no nulls, no duplicates
+        run: npm run check:keys
+
+      - name: Contrast gate
+        run: npm run check:contrast
+
+      - name: Contrast gate self-test — prove it can fail
+        run: npm run check:contrast-self-test
+
+      - name: Palette provenance — no colour outside the swatch
+        run: npm run check:provenance
+
+      - name: OLED drive-cost model
+        run: npm run check:power
+
+      - name: Extension version matches package version
+        run: |
+          ext=$(grep -oP '^version = "\K[^"]+' extension.toml)
+          pkg=$(node -p "require('./package.json').version")
+          echo "extension.toml=$ext package.json=$pkg"
+          [ "$ext" = "$pkg" ] || { echo "::error::version mismatch"; exit 1; }
