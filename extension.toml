@@ -1,0 +1,7 @@
+id = "jet-fighter"
+name = "Jet Fighter"
+version = "0.1.0"
+schema_version = 1
+authors = ["Christopher Nicholson <chris@cn-design.co.uk>"]
+description = "Cockpit-instrument theme family for Zed. Three variants — Afterburner (dark), Stealth (OLED), Contrail (light) — with all 185 style keys populated, vim mode annunciators, a 24-colour terminal, and a published contrast gate."
+repository = "https://github.com/chrisnicholson30/jet-fighter"
