@@ -39,7 +39,14 @@ jobs:
       - name: Build site
         run: npm run site:build
 
+      # enablement lets the workflow turn Pages on itself the first time it
+      # runs, via the Pages API, using the `pages: write` permission granted
+      # above. Without it the first run fails with "Get Pages site failed …
+      # Not Found" and the repository has to be configured by hand in
+      # Settings before the site can ever deploy.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist

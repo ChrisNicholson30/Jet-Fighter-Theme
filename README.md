@@ -313,7 +313,9 @@ npm run site:assets   # re-render the social card and icon set (needs Playwright
 
 Deployment is `.github/workflows/pages.yml`, which rebuilds on any push to
 `main` that touches the theme or the site, and fails first if the committed
-theme has drifted from `src/`.
+theme has drifted from `src/`. It enables Pages itself on the first run
+(`configure-pages` with `enablement: true`), so there is nothing to switch on
+in Settings.
 
 ---
 
