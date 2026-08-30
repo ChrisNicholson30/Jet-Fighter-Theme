@@ -17,6 +17,6 @@ Zed's Rust and Go users will find them otherwise.
 | `sample.css` | selectors vs properties vs values, at-rules |
 | `sample.html` | tags vs attributes vs text |
 
-Open each in all three variants. Nothing adjacent should read as the same
+Open each in all four variants. Nothing adjacent should read as the same
 colour, and the diff should show additions, deletions and the hunk header in
 three clearly different hues.

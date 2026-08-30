@@ -71,6 +71,7 @@ validate() {
   grep -q '"Jet Fighter Afterburner"' "$f" || return 1
   grep -q '"Jet Fighter Stealth"' "$f" || return 1
   grep -q '"Jet Fighter Contrail"' "$f" || return 1
+  grep -q '"Jet Fighter Hyperjet"' "$f" || return 1
   if command -v python3 >/dev/null 2>&1; then
     python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$f" >/dev/null 2>&1 || return 1
   elif command -v node >/dev/null 2>&1; then
@@ -83,6 +84,7 @@ variants() {
   say "  ${DIM}Afterburner${R}  dark      the reference build"
   say "  ${DIM}Stealth${R}      OLED      true black, 0.71x the modelled draw"
   say "  ${DIM}Contrail${R}     light     daylight legibility"
+  say "  ${DIM}Hyperjet${R}     special   warm dark, on the heat ramp"
 }
 
 # ---------------------------------------------------------------------- main

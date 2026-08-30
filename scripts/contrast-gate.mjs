@@ -30,8 +30,8 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { contrast, over, hueDrift, deltaE } from '../src/color.mjs';
-import { HUE_PAIRS } from '../src/palette.mjs';
+import { contrast, over, hueDrift, deltaE, hsl } from '../src/color.mjs';
+import { HUE_PAIRS, HEAT_RAMP } from '../src/palette.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -219,6 +219,46 @@ function main() {
   }
   console.log('');
 
+  // Hyperjet reassigns roles, so hue drift against Afterburner is the wrong
+  // question for it. The claim it makes instead is that severity runs down the
+  // heat ramp — gold nominal, orange caution, red danger — and that is checked
+  // here against the shipped file rather than against the palette constant, so
+  // it is an assertion about what installs.
+  console.log('  Hyperjet heat ramp (gate: hue falls toward red, steps dE 20 apart)');
+  let rampFail = 0;
+  const hyperjet = theme.themes.find((t) => t.name === 'Jet Fighter Hyperjet');
+  if (!hyperjet) {
+    console.log('    Hyperjet is not in the shipped file.');
+    rampFail += 1;
+  } else {
+    // Signed angle from red, so a hue just past red reads as negative rather
+    // than as 350-odd degrees and the ordering stays monotonic across the wrap.
+    const fromRed = (hex) => ((hsl(hex).h + 180) % 360) - 180;
+    const SHIPS_AS = { nominal: 'info', caution: 'warning', danger: 'error' };
+    let previous = Infinity;
+    for (const [step, hex] of HEAT_RAMP) {
+      const shipped = hyperjet.style[SHIPS_AS[step]].slice(0, 7).toLowerCase();
+      const same = shipped === hex.toLowerCase();
+      const angle = fromRed(hex);
+      if (!same || angle >= previous) rampFail += 1;
+      console.log(
+        `    ${step.padEnd(8)} ${hex} -> ${SHIPS_AS[step].padEnd(8)} ` +
+          `${angle.toFixed(1).padStart(6)} deg from red` +
+          `${same ? '' : `  <-- ships as ${shipped}`}` +
+          `${angle >= previous ? '  <-- out of order' : ''}`,
+      );
+      previous = angle;
+    }
+    for (let i = 1; i < HEAT_RAMP.length; i += 1) {
+      const d = deltaE(HEAT_RAMP[i - 1][1], HEAT_RAMP[i][1]);
+      if (d < 20) {
+        rampFail += 1;
+        console.log(`    ${HEAT_RAMP[i - 1][0]} and ${HEAT_RAMP[i][0]} differ by only dE ${d.toFixed(1)}`);
+      }
+    }
+  }
+  console.log('');
+
   // No two syntax hues may collapse into each other in running code.
   console.log('  Closest syntax hue pair per variant (gate: dE 8)');
   let deFail = 0;
@@ -238,8 +278,11 @@ function main() {
 
   if (wantTable) emitTable(rows, theme);
 
-  if (failed || driftFail || deFail) {
-    console.error(`FAILED — ${failed} contrast, ${driftFail} hue drift, ${deFail} hue collision.`);
+  if (failed || driftFail || deFail || rampFail) {
+    console.error(
+      `FAILED — ${failed} contrast, ${driftFail} hue drift, ${deFail} hue collision, ` +
+        `${rampFail} heat ramp.`,
+    );
     process.exit(1);
   }
   console.log('PASS — every token clears its floor on every surface it is drawn on.');
