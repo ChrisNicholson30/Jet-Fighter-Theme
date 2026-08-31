@@ -8,9 +8,15 @@
  *
  * This check makes that structural rather than a matter of vigilance. Every
  * chromatic colour in the shipped file must sit within 6 degrees of hue of a
- * locked swatch value or one of the seven Route B additions. Anything else is
- * either a neutral (saturation under 12%, which the greys and surfaces are) or
- * a foreign colour, and a foreign colour fails the build.
+ * value in one of the palette's named groups: the locked swatch, the seven
+ * Route B additions, the three Route C additions the special variants bring,
+ * or the two derived variant ramps. Anything else is either a neutral
+ * (saturation under 12%, which the greys and surfaces are) or a foreign
+ * colour, and a foreign colour fails the build.
+ *
+ * The groups are the point. A hue earns its way in by being written down in
+ * `src/palette.mjs` with a reason next to it — not by turning up in the
+ * output.
  *
  * `#22138B` lands 14.6 degrees from the nearest palette hue, so it would be
  * caught — that case is asserted below rather than asserted about.
@@ -20,7 +26,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { hsl, hueDrift } from '../src/color.mjs';
-import { SWATCH, ROUTE_B, CONTRAIL_HUES } from '../src/palette.mjs';
+import { SWATCH, ROUTE_B, ROUTE_C, CONTRAIL_HUES, HYPERJET_HUES } from '../src/palette.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const theme = JSON.parse(readFileSync(resolve(here, '..', 'themes/jet-fighter.json'), 'utf8'));
@@ -28,11 +34,13 @@ const theme = JSON.parse(readFileSync(resolve(here, '..', 'themes/jet-fighter.js
 const HUE_TOLERANCE = 6;
 const NEUTRAL_SATURATION = 12;
 
-/** Every hue the palette is allowed to contain, dark and light alike. */
+/** Every hue the palette is allowed to contain, dark, light and warm alike. */
 const ALLOWED = [
   ...Object.values(SWATCH),
   ...Object.values(ROUTE_B),
+  ...Object.values(ROUTE_C),
   ...Object.values(CONTRAIL_HUES),
+  ...Object.values(HYPERJET_HUES),
 ].filter((hex) => hsl(hex).s >= NEUTRAL_SATURATION);
 
 function classify(hex) {
@@ -86,9 +94,9 @@ console.log(
 );
 if (indigo.ok) failures += 1;
 
-console.log(`\n  ${total} colour values checked across three variants.`);
+console.log(`\n  ${total} colour values checked across ${theme.themes.length} variants.`);
 if (failures) {
   console.error(`\nFAILED — ${failures} colour(s) outside the palette.`);
   process.exit(1);
 }
-console.log('\nPASS — every colour traces to the locked swatch or a Route B addition.');
+console.log('\nPASS — every colour traces to a named group in src/palette.mjs.');

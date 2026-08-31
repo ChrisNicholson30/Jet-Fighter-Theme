@@ -1,16 +1,19 @@
 /**
  * Jet Fighter — palettes.
  *
- * Three variants, one source of truth. Afterburner is the reference build;
- * Stealth and Contrail are derivations of it, not separate designs.
+ * One source of truth, in two parts. The core family — Afterburner, Stealth,
+ * Contrail — is one design: Afterburner is the reference build and the other
+ * two are derivations of it, not separate designs. Below them, in their own
+ * section, are the special variants: builds allowed to reassign which hue plays
+ * which role, and held to every gate the core three are.
  *
  * The locked swatch (brief §4) is reproduced here byte-for-byte and must not
- * change. Route B (brief §5) adds seven hues, all drawn from the same Tailwind
- * ramp the swatch itself comes from, so nothing is imported from a foreign
- * colour system.
+ * change. Route B (brief §5) adds seven hues and Route C adds three more, all
+ * drawn from the same Tailwind ramp the swatch itself comes from, so nothing is
+ * imported from a foreign colour system.
  */
 
-import { mix, alpha, over, deriveForGround, solveLightness } from './color.mjs';
+import { mix, alpha, over, deriveForGround, solveLightness, hsl, fromHsl } from './color.mjs';
 
 /** The eight locked swatch values. Not to be edited — see brief §3 non-goals. */
 export const SWATCH = {
@@ -255,7 +258,141 @@ export const contrail = derive({
   light: true,
 });
 
-export const VARIANTS = [afterburner, stealth, contrail];
+// ===========================================================================
+// Special variants
+//
+// The three builds above are the core family: one locked swatch, one set of
+// role assignments, three grounds. A *special* variant is held to every gate
+// the core builds are — coverage, contrast, separability, provenance — but is
+// allowed the one liberty they are not: it may reassign which hue plays which
+// role. That is a large enough departure to be fenced into its own section
+// rather than appended to the list above, so "which build is allowed to move
+// the palette around" is answered by where the code lives.
+// ===========================================================================
+
+/**
+ * Route C — Reheat. Three hues, and the first true red and true yellow in the
+ * family. Same Tailwind ramp as everything else, so nothing is imported from a
+ * foreign colour system.
+ *
+ * The three are not three unrelated additions: they are one idea. Severity runs
+ * down the heat ramp — gold is nominal, orange is caution, red is danger — so a
+ * status colour's meaning is legible from its hue angle alone, before any
+ * shape or label is read. `scripts/contrast-gate.mjs` asserts that ordering.
+ */
+export const ROUTE_C = {
+  nominal: '#FDE047', // yellow-300 — functions, info, renamed, NORMAL mode
+  caution: '#FB923C', // orange-400 — warning, modified
+  danger: '#F87171',  // red-400    — error, deleted, REPLACE mode
+};
+
+/**
+ * Hyperjet's surfaces.
+ *
+ * Contrail's ground is the swatch's own text colour reused. Hyperjet's is the
+ * exhaust: `ROUTE_B.number`'s hue angle held exactly, with saturation and
+ * lightness then set per plane.
+ *
+ * The obvious alternative — mix a warm tint into the cool `#0B0F14` ramp — does
+ * not work, and it is worth recording why rather than rediscovering it. Mixing
+ * toward a lighter colour only ever runs the plane lighter, so a 5.5%-lightness
+ * ground is not reachable from a 6.1% one at any weight. And the two hues are
+ * near-complementary, so the weights subtle enough to still read as neutral
+ * cancel instead of warming: 0.04 to 0.08 of orange-300 into `#0B0F14` lands at
+ * 2-7% saturation with the hue angle swinging 220 -> 300 -> 30 degrees as the
+ * weight moves. That is not warm, it is muddy, and its hue is meaningless.
+ *
+ * Setting h, s and l independently decouples them: the angle is fixed first and
+ * the plane is placed second, so every surface is warm by construction and
+ * traceable to one palette hue.
+ */
+const EXHAUST_HUE = hsl(ROUTE_B.number).h;
+const plane = (s, l) => fromHsl({ h: EXHAUST_HUE, s, l }).slice(0, 7);
+
+export const HYPERJET_SURFACES = {
+  background: plane(22, 5.5),  // editor ground — warm gunmetal, not brown
+  surface: plane(21, 8.6),     // chrome
+  panel: plane(20, 13.5),      // elevated surfaces, active line
+  muted: plane(18, 21),        // borders and rules. Never text.
+  text: plane(38, 95),
+  textBright: plane(45, 98.5), // the emphasis pole
+};
+
+/**
+ * Hyperjet's role assignments.
+ *
+ * What moves: the cool primary becomes gold, and the status trio moves onto the
+ * heat ramp. What stays: keywords are still purple, types still sky, strings
+ * still emerald, `#7C3AED` is still a field colour that never carries text.
+ * The family reads as the family; the cockpit is simply lit by the burner
+ * rather than by daylight.
+ *
+ * `number` keeps orange-300 deliberately. It is the hue the neutral ramp is
+ * built from, so numerals sit in the same family as the surfaces they are drawn
+ * on — and it is still dE 24.8 from caution's orange-400, comfortably clear of
+ * every separation gate.
+ */
+export const HYPERJET_HUES = {
+  ...HYPERJET_SURFACES,
+  primary: ROUTE_C.nominal,
+  caution: ROUTE_C.caution,
+  danger: ROUTE_C.danger,
+  accent: SWATCH.accent,       // keywords stay purple-500
+  secondary: SWATCH.secondary, // fields only, exactly as in the core builds
+  go: ROUTE_B.go,
+  string: ROUTE_B.string,
+  number: ROUTE_B.number,
+  type: ROUTE_B.type,
+  comment: plane(14, 55),
+};
+
+/**
+ * Hyperjet — reheat. A warm dark build for the hours the daylight variant is
+ * wrong for and the OLED variant is too austere for.
+ *
+ * The terminal does not follow the rotation. `ansiHues` pins the six ANSI slots
+ * to hues that match their names — `blue` back to the locked `#38BDF8`, `yellow`
+ * to the gold, `red` to the new red — because ANSI is a compatibility surface,
+ * not a design surface. A theme that ships a gold `terminal.ansi.blue` because
+ * gold happens to be its primary breaks every program that colours its own
+ * output, and the breakage looks like the program's fault.
+ */
+export const hyperjet = derive({
+  id: 'hyperjet',
+  name: 'Jet Fighter Hyperjet',
+  appearance: 'dark',
+  ...HYPERJET_HUES,
+  poles: { fg: HYPERJET_SURFACES.textBright, bg: HYPERJET_SURFACES.background },
+  commentSeed: HYPERJET_HUES.comment,
+  // The warm panel sits closer to its ground than the cool one does, so the
+  // band needs a little more of it to read as a band at all. 0.34 is the most
+  // it can take while the purple keyword still clears the body floor on it.
+  activeLineAlpha: 0.34,
+  punctuationAlpha: 0.52,
+  lineNumberAlpha: 0.44,
+  invisibleAlpha: 0.4,
+  ansiBlack: HYPERJET_SURFACES.muted,
+  ansiWhite: mix(HYPERJET_SURFACES.text, HYPERJET_SURFACES.background, 0.78).slice(0, 7),
+  ansiHues: {
+    red: ROUTE_C.danger,
+    green: ROUTE_B.go,
+    yellow: ROUTE_C.nominal,
+    blue: SWATCH.primary, // the locked sky-400, back where a terminal expects it
+    magenta: SWATCH.accent,
+    cyan: ROUTE_B.type,
+  },
+  textRamp: {
+    bright: HYPERJET_SURFACES.textBright,
+    muted: 0.7,
+    placeholder: 0.55,
+    disabled: 0.38,
+  },
+  special: true,
+});
+
+export const CORE_VARIANTS = [afterburner, stealth, contrail];
+export const SPECIAL_VARIANTS = [hyperjet];
+export const VARIANTS = [...CORE_VARIANTS, ...SPECIAL_VARIANTS];
 
 /** The dark-to-light correspondence the hue-drift assertion runs over. */
 export const HUE_PAIRS = Object.keys(CONTRAIL_TARGETS).map((role) => [
@@ -263,3 +400,14 @@ export const HUE_PAIRS = Object.keys(CONTRAIL_TARGETS).map((role) => [
   DARK_HUE_SOURCES[role],
   CONTRAIL_HUES[role],
 ]);
+
+/**
+ * Hyperjet's heat ramp, in severity order. The gate asserts that hue angle
+ * falls monotonically toward red as severity rises, and that no two steps
+ * collapse into each other.
+ */
+export const HEAT_RAMP = [
+  ['nominal', ROUTE_C.nominal],
+  ['caution', ROUTE_C.caution],
+  ['danger', ROUTE_C.danger],
+];

@@ -5,7 +5,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] — unreleased
 
-First release. Three variants in one theme family.
+First release. Four variants in one theme family.
 
 ### Added
 
@@ -13,6 +13,16 @@ First release. Three variants in one theme family.
 - **Jet Fighter Stealth** — OLED, on true black, measured at 0.71x Afterburner's
   modelled drive cost under every weighting tested.
 - **Jet Fighter Contrail** — light, for daylight legibility.
+- **Jet Fighter Hyperjet** — the first *special* variant: a warm dark build on a
+  ground hue-locked to the palette's own orange, with the status trio moved onto
+  a heat ramp (gold nominal, orange caution, red danger). Special variants may
+  reassign which hue plays which role; they are held to every gate the core
+  three are. Adds **Route C**: `#FDE047`, `#FB923C` and `#F87171` — the family's
+  first true yellow and true red — from the same Tailwind ramp as the rest of
+  the palette.
+- An **ANSI hue map** a variant can override, so a build that reassigns roles
+  keeps a terminal whose `blue` is blue. The core three do not set it and their
+  output is unchanged.
 - All **185** UI style keys populated in every variant, including the 46 that
   One Dark leaves unset: the vim and Helix mode indicators, the minimap, editor
   and panel indent guides, diff-hunk row highlights, the debugger accent, and
@@ -35,11 +45,13 @@ First release. Three variants in one theme family.
   token against the worst surface it is drawn on (including the active-line
   band), and holds recessive tokens to a named lower floor rather than
   exempting them. Ships with a self-test that proves it rejects a known-bad
-  colour.
+  colour. Also asserts Hyperjet's heat ramp against the shipped file: severity
+  must fall toward red in hue, and no two steps may collapse.
 - `scripts/key-coverage.mjs` — checks against the key inventory extracted from
   the Zed source, not against One Dark.
 - `scripts/provenance.mjs` — proves every colour in the shipped file traces to
-  the locked swatch or a Route B addition.
+  a named group in `src/palette.mjs`: the locked swatch, Route B, Route C or a
+  derived variant ramp.
 - `scripts/power-model.mjs` — the OLED drive-cost model, published with its
   assumptions and re-run under three weightings.
 - `src/build.mjs --check` — fails if the committed JSON has drifted from source.

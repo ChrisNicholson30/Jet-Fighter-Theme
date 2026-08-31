@@ -1,11 +1,10 @@
 /**
  * Jet Fighter — style builder.
  *
- * One function maps a variant palette to the complete Zed style object. All
- * three variants run through this single code path, which is what guarantees
- * they cannot drift apart in key coverage: if a key is populated for one
- * variant it is populated for all three, and a `null` is impossible by
- * construction.
+ * One function maps a variant palette to the complete Zed style object. Every
+ * variant runs through this single code path, which is what guarantees they
+ * cannot drift apart in key coverage: if a key is populated for one variant it
+ * is populated for all of them, and a `null` is impossible by construction.
  *
  * Key inventory is 185 UI keys, taken from the Zed source rather than from
  * One Dark — see `data/zed-keys.json`. One Dark itself populates only 139 of
@@ -45,8 +44,8 @@ export function buildStyle(v) {
   // Terminal ANSI. 24 keys, every one distinct — asserted by the gate.
   //
   // `bright` moves a hue toward the variant's light pole and `dim` toward its
-  // dark pole, so the emphasis ordering dim < normal < bright holds in all
-  // three variants rather than only on a dark ground.
+  // dark pole, so the emphasis ordering dim < normal < bright holds in every
+  // variant rather than only on a dark ground.
   // ---------------------------------------------------------------------
   const ansiBright = (c) => emphasise(c, 0.72);
   // 0.75 is the shallowest dim step that keeps every hue above the recessive
@@ -58,6 +57,27 @@ export function buildStyle(v) {
     [`terminal.ansi.bright_${name}`]: opaque(ansiBright(hue)),
     [`terminal.ansi.dim_${name}`]: opaque(ansiDim(hue)),
   });
+
+  /**
+   * Which hue fills each ANSI slot. The default is the variant's own roles,
+   * which is right for every build whose roles sit on the hues their slots are
+   * named after — all three core variants.
+   *
+   * A special variant that reassigns roles must not drag the terminal with it.
+   * ANSI is a compatibility surface, not a design surface: programs assume
+   * `blue` is blue, and a theme that ships a gold `terminal.ansi.blue` because
+   * gold happens to be its primary breaks every tool that colours its own
+   * output — and the breakage looks like the tool's fault, not the theme's.
+   * Such a variant supplies `ansiHues` and the six slots keep their names.
+   */
+  const hues = v.ansiHues ?? {
+    red: v.danger,
+    green: v.go,
+    yellow: v.caution,
+    blue: v.primary,
+    magenta: v.accent,
+    cyan: v.type,
+  };
 
   // ---------------------------------------------------------------------
   // Vim / Helix mode annunciators.
@@ -241,12 +261,12 @@ export function buildStyle(v) {
     'terminal.ansi.bright_white': opaque(emphasise(v.ansiWhite, 0.55)),
     'terminal.ansi.dim_white': opaque(recede(v.ansiWhite, 0.55)),
 
-    ...ansi('red', v.danger),
-    ...ansi('green', v.go),
-    ...ansi('yellow', v.caution),
-    ...ansi('blue', v.primary),
-    ...ansi('magenta', v.accent),
-    ...ansi('cyan', v.type),
+    ...ansi('red', hues.red),
+    ...ansi('green', hues.green),
+    ...ansi('yellow', hues.yellow),
+    ...ansi('blue', hues.blue),
+    ...ansi('magenta', hues.magenta),
+    ...ansi('cyan', hues.cyan),
 
     // -------------------------------------------------------------------
     // Links

@@ -34,7 +34,14 @@ const NON_COLOUR_KEYS = new Set(['background.appearance', 'accents', 'players', 
 // --------------------------------------------------------------------------
 if (theme.$schema !== zed.schema) fail(`$schema is ${theme.$schema}, expected ${zed.schema}`);
 if (!theme.name || !theme.author) fail('family is missing name or author');
-if (theme.themes.length !== 3) fail(`expected 3 variants, found ${theme.themes.length}`);
+// Three core variants plus the special variants (see src/palette.mjs). Stated
+// as a literal rather than read from src/ on purpose: this gate is an
+// assertion about the artefact that ships, so a build that silently drops a
+// variant fails here rather than quietly agreeing with itself.
+const EXPECTED_VARIANTS = 4;
+if (theme.themes.length !== EXPECTED_VARIANTS) {
+  fail(`expected ${EXPECTED_VARIANTS} variants, found ${theme.themes.length}`);
+}
 
 const appearances = theme.themes.map((t) => t.appearance);
 if (!appearances.includes('light')) fail('no light variant in the family');

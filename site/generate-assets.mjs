@@ -166,9 +166,9 @@ p{margin-top:26px;font-size:26px;line-height:1.42;color:#CBD5E1;max-width:19ch;f
 <div class="txt">
   <div class="eyebrow">Theme family · Zed</div>
   <h1>Jet<span>Fighter</span></h1>
-  <p>All 185 style keys. Three variants. Evidence, not adjectives.</p>
+  <p>All 185 style keys. Four variants. Evidence, not adjectives.</p>
   <div class="bar">
-    <span class="pill on">Afterburner</span><span class="pill">Stealth</span><span class="pill">Contrail</span>
+    <span class="pill on">Afterburner</span><span class="pill">Stealth</span><span class="pill">Contrail</span><span class="pill">Hyperjet</span>
   </div>
 </div>`;
 

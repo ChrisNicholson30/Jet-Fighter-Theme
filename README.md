@@ -1,6 +1,6 @@
 # Jet Fighter
 
-A cockpit-instrument theme family for [Zed](https://zed.dev). Three variants,
+A cockpit-instrument theme family for [Zed](https://zed.dev). Four variants,
 one file, every key populated.
 
 | | | |
@@ -8,6 +8,7 @@ one file, every key populated.
 | **Afterburner** | dark | the reference build, on `#0B0F14` |
 | **Stealth** | OLED | true black, measured at **0.71×** Afterburner's modelled drive cost |
 | **Contrail** | light | daylight legibility — and honestly not a power saving |
+| **Hyperjet** | special | warm dark — the palette rotated onto a heat ramp, on an exhaust-hue ground |
 
 Built natively for Zed rather than ported from a VS Code theme, which is most
 of what follows.
@@ -66,7 +67,7 @@ ones a VS Code port cannot know about because VS Code has no concept of them:
 | Debugger accent & active line | 2 | ✗ |
 | Panel overlays, drop-target border, bracket highlight, others | 8 | ✗ |
 
-Jet Fighter populates all 185, in all three variants, with **zero `null`s**. It
+Jet Fighter populates all 185, in all four variants, with **zero `null`s**. It
 also populates `accents`, the indent-guide colour array that One Dark leaves
 empty — without it, indent-aware guide colouring falls back to Zed's built-in
 ramp, which has nothing to do with the active theme.
@@ -108,6 +109,11 @@ illegible label.
 | `V-BLOCK` | type — light sky | |
 | Helix `NORMAL` / `SELECT` | amber / orange | |
 
+The hues named here are the core family's. The mapping is role-to-mode, not
+colour-to-mode, so a variant that reassigns roles keeps the same eight chips in
+its own palette — Hyperjet's `NORMAL` is gold and its Helix `NORMAL` orange,
+still eight mutually distinct lamps with computed labels.
+
 ### 4. A terminal with 24 distinct colours
 
 `dim`, `normal` and `bright` are separable on every hue by a colour difference of
@@ -125,7 +131,9 @@ swatch itself comes from — because the schema *requires* `error`, `warning`,
 `success`, `created`, `deleted`, `modified`, `conflict` and 24 ANSI slots, and a
 git diff where additions and deletions are both violet is unusable.
 
-Contrast is against each variant's own editor ground.
+Contrast is against each variant's own editor ground. Hyperjet reassigns
+several of these roles and has its own table under
+[Special variants](#special-variants).
 
 | Role | Afterburner | | Stealth | | Contrail | |
 |---|---|---|---|---|---|---|
@@ -168,6 +176,121 @@ the same lightness and makes them indistinguishable.
 
 ---
 
+## Special variants
+
+The three above are the core family: one locked swatch, one set of role
+assignments, three grounds. A **special variant** is held to every gate they are
+— coverage, contrast, separability, provenance — but is allowed the one liberty
+they are not: it may reassign which hue plays which role.
+
+That is a large enough departure to live in its own section of
+[`src/palette.mjs`](src/palette.mjs) rather than at the end of the list, so
+*which build is allowed to move the palette around* is answered by where the
+code sits.
+
+### Hyperjet — reheat
+
+A warm dark build for the hours the light variant is wrong for and the OLED one
+is too austere for: the same cockpit, lit by the burner rather than by daylight.
+
+**The ground is the exhaust.** Contrail's ground is the swatch's own text colour
+reused; Hyperjet's whole neutral ramp is `#FDBA74`'s hue angle held exactly, with
+saturation and lightness then set per plane. Every plane lands within **1.7°** of
+that one angle, and the residue is 8-bit rounding rather than drift.
+
+The obvious alternative — mix a warm tint into the cool `#0B0F14` ramp — does not
+work, twice over. Mixing toward a lighter colour only runs the plane *lighter*,
+so a 5.5%-lightness ground is not reachable from a 6.1% one at any weight. And
+the two hues are near-complementary, so the weights subtle enough to still read
+as a neutral cancel rather than warm: 0.04 to 0.08 of orange-300 into `#0B0F14`
+lands at **2–7% saturation** with the hue angle swinging 220° → 300° → 30° as the
+weight moves. Setting hue, saturation and lightness independently decouples them
+— fix the angle, then place the plane.
+
+**Severity runs down the heat ramp.** Route C adds three hues, from the same
+Tailwind ramp as everything else, and with them the family's first true yellow
+and first true red:
+
+| Step | Hue | From red | Ships as |
+|---|---|---|---|
+| nominal | `#FDE047` yellow-300 | 50.4° | `info`, functions, `NORMAL` |
+| caution | `#FB923C` orange-400 | 27.0° | `warning`, `modified`, Helix `NORMAL` |
+| danger | `#F87171` red-400 | 0.0° | `error`, `deleted`, `REPLACE` |
+
+A status colour's meaning is readable from its hue angle before its label is.
+The gate asserts that ordering — and asserts it against the shipped file rather
+than against the constant in `src/`, so it is a statement about what installs:
+
+```
+Hyperjet heat ramp (gate: hue falls toward red, steps dE 20 apart)
+  nominal  #FDE047 -> info       50.4 deg from red
+  caution  #FB923C -> warning    27.0 deg from red
+  danger   #F87171 -> error       0.0 deg from red
+```
+
+**The palette against the reference build.** Contrast is against each build's own
+editor ground:
+
+| Role | Afterburner | | Hyperjet | |
+|---|---|---|---|---|
+| Background | `#0B0F14` | — | `#110E0B` | — |
+| Surface | `#111827` | | `#1B1611` | |
+| Panel | `#1F2937` | | `#29231C` | |
+| Muted (never text) | `#2D3748` | | `#3F362C` | |
+| Text | `#F8FAFC` | 18.37 | `#F7F2ED` | 17.30 |
+| Comment | `#728299` | 4.91 | `#9C8D7C` | 5.97 |
+| Primary — functions | `#38BDF8` | 8.97 | `#FDE047` | 14.59 |
+| Secondary — fields only | `#7C3AED` | 3.37 | `#7C3AED` | 3.38 |
+| Accent — keywords | `#A855F7` | 4.86 | `#A855F7` | 4.86 |
+| Type / operator | `#7DD3FC` | 11.53 | `#7DD3FC` | 11.54 |
+| String | `#6EE7B7` | 12.61 | `#6EE7B7` | 12.62 |
+| Number / constant | `#FDBA74` | 11.40 | `#FDBA74` | 11.41 |
+| Success / created | `#34D399` | 10.00 | `#34D399` | 10.01 |
+| Warning / modified | `#FBBF24` | 11.51 | `#FB923C` | 8.50 |
+| Danger / deleted | `#FB7185` | 7.14 | `#F87171` | 6.96 |
+
+Four chromatic roles move — `primary`, `warning`, `danger` and the comment grey
+— and the neutral ramp with them. The rest hold: keywords are still purple, types
+still sky, strings still emerald, and `#7C3AED` is still a field colour that
+never carries text, 3.38:1 here and as unusable for a foreground as it is
+everywhere else. The family still reads as the family.
+
+### Three things the gates decided, not taste
+
+**Keywords wanted to be red, and cannot be.** A hot red keyword is the obvious
+move for a reheat variant. But `accent` also lights the `VISUAL` chip and
+`danger` lights `REPLACE`, and rose-400 against red-400 is **dE 10.5** — under
+the 12 the gate requires between any two mode lamps. The warm band holds about
+three well-separated roles, and the status trio already has them. Keywords stayed
+purple because the gate said so, not because it was the safe choice.
+
+**`warning` is orange rather than amber.** Amber-400 — the core family's
+`caution` — sits **dE 17.4** from the gold, under the **20** the gate requires
+between any two version-control states: `modified` and `renamed` would have been
+too close to tell apart in the git panel. Moving `caution` one step along the
+ramp to orange-400 puts them dE 45.6 apart.
+
+**`danger` is red-400 rather than red-500.** Red-500 is the truer red and it
+misses: **4.13:1** on the elevated surface, under the 4.5 body floor, because
+diagnostics are drawn on panels as well as in the buffer. Red-400 clears it at
+5.62:1. (Red-500 misses the same check on Afterburner's panel too, at 3.90:1 —
+the elevated surface is where reds get caught, and it is the one contrast tables
+usually leave out.)
+
+### The terminal does not follow the rotation
+
+ANSI is a compatibility surface, not a design surface. A theme that ships a gold
+`terminal.ansi.blue` because gold happens to be its primary breaks every program
+that colours its own output, and the breakage looks like the program's fault.
+
+So Hyperjet supplies its own ANSI hue map, and only the two slots whose hues
+actually changed move — `red` to the new red, `yellow` to the gold. `blue` goes
+back to the locked `#38BDF8`, and `green`, `magenta` and `cyan` are byte-for-byte
+what Afterburner ships. All 24 values stay distinct, and `dim`/`normal`/`bright`
+stay dE 8 apart on every hue, checked as they are everywhere else.
+
+---
+
 ## Contrast gate
 
 `npm run check:contrast` — **387 measurements per variant, 0 below floor.**
@@ -177,6 +300,7 @@ the same lightness and makes them indistinguishable.
 | Afterburner | 387 | 4.55:1 | 0 |
 | Stealth | 387 | 4.66:1 | 0 |
 | Contrail | 387 | 4.75:1 | 0 |
+| Hyperjet | 387 | 4.59:1 | 0 |
 
 Three things about this gate are not standard practice, and are the reason the
 numbers can be trusted.
@@ -253,6 +377,7 @@ So Stealth is not Afterburner with a black background:
 | Afterburner | 0.0654 | 1.00× |
 | **Stealth** | 0.0465 | **0.71×** |
 | Contrail | 0.8874 | 13.6× |
+| Hyperjet | 0.0595 | 0.91× |
 
 The ratio is **0.711× under all three weightings tested** — blue-penalised, mild
 penalty, and equal weights. That insensitivity is the point: when a parameter is
@@ -261,6 +386,13 @@ not depend on it.
 
 **Contrail is not a power saving and this README will not pretend otherwise.** It
 exists for daylight legibility.
+
+**Hyperjet is not sold as a power variant either, but the model has an opinion
+about it.** The same argument that makes a cyan-and-violet palette the expensive
+end of OLED makes a warm one cheap: rotating the palette off blue comes in at
+**0.91×** the reference build without trying to, and at 0.91–0.94× across all
+three weightings. It is still not Stealth — the ground is lit pixels, and the
+ground is where Stealth wins.
 
 ---
 
@@ -339,16 +471,17 @@ npm test          # all six gates
 | Path | |
 |---|---|
 | `src/color.mjs` | colour engine — compositing, WCAG, CIE Lab, hue-preserving solvers |
-| `src/palette.mjs` | the locked swatch, Route B, and the three variant palettes |
+| `src/palette.mjs` | the locked swatch, Routes B and C, and the four variant palettes |
 | `src/style.mjs` | one function mapping a palette to all 185 keys |
 | `src/syntax.mjs` | the 134 syntax tokens |
 | `src/build.mjs` | emits the family file; `--check` fails on drift |
 | `scripts/` | the gates, each runnable on its own |
 | `assets/proof/` | ten-file proof corpus across eight languages, Markdown and a diff |
 
-All three variants run through a **single code path**, which is what stops them
-drifting apart: a key populated for one is populated for all three, and a `null`
-is impossible by construction.
+All four variants run through a **single code path**, which is what stops them
+drifting apart: a key populated for one is populated for all of them, and a
+`null` is impossible by construction. A special variant reassigns roles by
+handing that code path a different palette — never by forking it.
 
 `themes/jet-fighter.json` is generated and committed. `npm run check:build` fails
 if it has been hand-edited, so the shipped file cannot silently diverge from its

@@ -215,7 +215,7 @@ export const TERMINAL_SESSION = [
   { ansi: 'red', text: '#7C3AED' },
   { text: ' (3.37:1)\n' },
   { ansi: 'green', text: 'PASS' },
-  { text: '  every colour traces to the locked swatch\n' },
+  { text: '  every colour traces to a named palette group\n' },
   { ansi: 'green', text: 'PASS' },
   { text: '  Stealth holds at ' },
   { ansi: 'cyan', text: '0.71×' },

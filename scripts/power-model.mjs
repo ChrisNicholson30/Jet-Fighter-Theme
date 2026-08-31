@@ -73,6 +73,7 @@ const byName = Object.fromEntries(theme.themes.map((t) => [t.name, t]));
 const afterburner = byName['Jet Fighter Afterburner'];
 const stealth = byName['Jet Fighter Stealth'];
 const contrail = byName['Jet Fighter Contrail'];
+const hyperjet = byName['Jet Fighter Hyperjet'];
 
 console.log('Jet Fighter — OLED drive-cost model\n');
 console.log('  A model, not a measurement. Weights r 0.24 / g 0.28 / b 0.48, gamma 2.2,');
@@ -111,6 +112,22 @@ console.log(`    worst case      ${worstRatio.toFixed(3)}x`);
 console.log(
   `\n  Contrail measures ${(composite(contrail, WEIGHTINGS['blue-penalised']) / base).toFixed(1)}x ` +
     'the reference build. It exists for daylight legibility,\n  not power, and the README says so rather than implying otherwise.\n',
+);
+
+// Hyperjet is not sold as a power variant either, but the model has an opinion
+// about it, and the opinion is worth printing: the same argument that makes a
+// cyan-and-violet palette expensive makes a warm one cheap. Reported under
+// every weighting, because a claim that only holds under the blue-penalised
+// one would be an artefact of the weighting rather than of the palette.
+console.log('  Hyperjet, a warm palette on the same argument');
+for (const [name, w] of Object.entries(WEIGHTINGS)) {
+  const ratio = composite(hyperjet, w) / composite(afterburner, w);
+  console.log(`    ${name.padEnd(16)} ${ratio.toFixed(3)}x Afterburner`);
+}
+console.log(
+  '    Blue emitters cost the most drive current, so rotating the palette warm is\n' +
+    '    cheaper than the reference build without trying to be. It is still not\n' +
+    '    Stealth: the ground is lit pixels, and that is where Stealth wins.\n',
 );
 
 const GATE = 0.8;

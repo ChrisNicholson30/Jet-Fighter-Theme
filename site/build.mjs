@@ -93,10 +93,10 @@ function tokensFor(v) {
 }
 
 /**
- * Syntax classes. Token names are identical across the three variants — they
- * come from one builder — so a token resolves to the same class everywhere and
- * only the custom property behind it changes. That is why the code samples can
- * be highlighted once and still be correct in all three variants.
+ * Syntax classes. Token names are identical across every variant — they come
+ * from one builder — so a token resolves to the same class everywhere and only
+ * the custom property behind it changes. That is why the code samples can be
+ * highlighted once and still be correct in all of them.
  */
 function syntaxCss() {
   const names = Object.keys(VARIANTS[0].style.syntax);
@@ -289,7 +289,7 @@ function page() {
       `<button class="chip" role="tab" aria-pressed="${v.id === 'afterburner'}" data-variant="${v.id}" style="--chip-bg:${v.style['text.accent']};--chip-fg:${v.style['editor.background']}"><span class="chip__led"></span>${esc(v.short)}</button>`,
   ).join('');
 
-  const desc = 'Jet Fighter — a cockpit-instrument theme family for Zed. Three variants, all 185 style keys populated, a published contrast gate and OLED power model.';
+  const desc = 'Jet Fighter — a cockpit-instrument theme family for Zed. Four variants, all 185 style keys populated, a published contrast gate and OLED power model.';
 
   return `<!doctype html>
 <html lang="en" data-variant="afterburner">
@@ -330,7 +330,7 @@ function page() {
         <div class="hero__eyebrow rise"><span class="micro">Theme family · Zed · MIT</span></div>
         <h1 class="display rise" style="animation-delay:60ms">Jet<span class="l2">Fighter</span></h1>
         <p class="hero__lede rise" style="animation-delay:120ms">
-          Three variants, built natively for Zed rather than ported.
+          Four variants, built natively for Zed rather than ported.
           <b>All 185 style keys populated</b> — including the 46 One Dark leaves unset.
         </p>
 
@@ -400,7 +400,7 @@ function page() {
     </div>
     <div class="callouts" style="margin-top:1.6rem">
       <div class="callout"><b>Read it first</b><a href="install.sh" style="color:var(--accent)">install.sh</a> is about a hundred lines. It validates the download before writing, is idempotent, and never needs sudo.</div>
-      <div class="callout"><b>By hand</b>Copy <code class="mono">themes/jet-fighter.json</code> into <code class="mono">~/.config/zed/themes/</code>. All three variants appear in the theme selector on next load.</div>
+      <div class="callout"><b>By hand</b>Copy <code class="mono">themes/jet-fighter.json</code> into <code class="mono">~/.config/zed/themes/</code>. All four variants appear in the theme selector on next load.</div>
       <div class="callout"><b>Uninstall</b>Same script, <code class="mono">--uninstall</code>. Or <code class="mono">--check</code> to see what it would do without writing anything.</div>
     </div>
   </section>
