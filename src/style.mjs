@@ -94,6 +94,21 @@ export function buildStyle(v) {
     [`vim.${name}.foreground`]: opaque(chipLabel(chip)),
   });
 
+  /**
+   * The neutral-state signal: information, a rename, and the annunciator for the
+   * mode where nothing is happening. Defaults to the primary, which is what
+   * every core build wants — a cool accent doubling as the "nothing is wrong"
+   * hue, and the reason the two have never needed separating.
+   *
+   * They are two jobs, though, and a variant whose primary is red cannot let one
+   * colour do both. `info` beside `error` and `version_control.renamed` beside
+   * `.deleted` would each be two reds telling the reader opposite things. Worse,
+   * `NORMAL` beside `REPLACE`: the annunciator exists to be read at a glance,
+   * and `REPLACE` means you are overwriting. In a build where everything else is
+   * red, the red lamp has to be reserved for the mode that earns it.
+   */
+  const signal = v.signal ?? v.primary;
+
   const status = (name, hex) => ({
     [name]: opaque(hex),
     [`${name}.background`]: fill(hex, 0.16),
@@ -280,7 +295,7 @@ export function buildStyle(v) {
     'version_control.added': opaque(v.go),
     'version_control.deleted': opaque(v.danger),
     'version_control.modified': opaque(v.caution),
-    'version_control.renamed': opaque(v.primary),
+    'version_control.renamed': opaque(signal),
     'version_control.conflict': opaque(v.conflictColor),
     'version_control.ignored': alpha(v.comment, 0.86),
     'version_control.word_added': fill(v.go, 0.3),
@@ -291,7 +306,7 @@ export function buildStyle(v) {
     // -------------------------------------------------------------------
     // Vim and Helix mode annunciators
     // -------------------------------------------------------------------
-    ...mode('normal', v.primary),        // cruise
+    ...mode('normal', signal),           // cruise — nothing is happening
     ...mode('insert', v.go),             // cleared to write
     ...mode('replace', v.danger),        // armed — you are overwriting
     ...mode('visual', v.accent),
@@ -308,12 +323,12 @@ export function buildStyle(v) {
     ...status('error', v.danger),
     ...status('warning', v.caution),
     ...status('success', v.go),
-    ...status('info', v.primary),
+    ...status('info', signal),
     ...status('hint', v.comment),
     ...status('created', v.go),
     ...status('deleted', v.danger),
     ...status('modified', v.caution),
-    ...status('renamed', v.primary),
+    ...status('renamed', signal),
     ...status('conflict', v.conflictColor),
     ...status('predictive', v.comment),
     ...status('ignored', v.comment),
