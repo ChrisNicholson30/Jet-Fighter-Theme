@@ -8,7 +8,7 @@ one file, every key populated.
 | **Afterburner** | dark | the reference build, on `#0B0F14` |
 | **Stealth** | OLED | true black, measured at **0.71×** Afterburner's modelled drive cost |
 | **Contrail** | light | daylight legibility — and honestly not a power saving |
-| **Hyperjet** | special | warm dark — the palette rotated onto a heat ramp, on an exhaust-hue ground |
+| **Hyperjet** | special | warm dark — a vivid red identity on an exhaust-hue ground |
 
 Built natively for Zed rather than ported from a VS Code theme, which is most
 of what follows.
@@ -101,7 +101,7 @@ illegible label.
 
 | Mode | Chip | Reading |
 |---|---|---|
-| `NORMAL` | primary — sky | cruise |
+| `NORMAL` | signal (= primary in the core builds) — sky | cruise |
 | `INSERT` | success — emerald | cleared to write |
 | `REPLACE` | danger — rose | armed; you are overwriting |
 | `VISUAL` | accent — purple | |
@@ -111,8 +111,9 @@ illegible label.
 
 The hues named here are the core family's. The mapping is role-to-mode, not
 colour-to-mode, so a variant that reassigns roles keeps the same eight chips in
-its own palette — Hyperjet's `NORMAL` is gold and its Helix `NORMAL` orange,
-still eight mutually distinct lamps with computed labels.
+its own palette. Hyperjet reassigns which hue plays which role and still lands
+on these same eight, for a reason worth reading: see
+[Special variants](#special-variants).
 
 ### 4. A terminal with 24 distinct colours
 
@@ -188,10 +189,13 @@ That is a large enough departure to live in its own section of
 *which build is allowed to move the palette around* is answered by where the
 code sits.
 
-### Hyperjet — reheat
+### Hyperjet — burner lit
 
 A warm dark build for the hours the light variant is wrong for and the OLED one
-is too austere for: the same cockpit, lit by the burner rather than by daylight.
+is too austere for, running on the red an aircraft actually lights its cockpit
+with at night. Everything the editor uses to say *here, now, you* — functions,
+the cursor, the active line number, focus rings, links — is a vivid red on warm
+gunmetal.
 
 **The ground is the exhaust.** Contrail's ground is the swatch's own text colour
 reused; Hyperjet's whole neutral ramp is `#FDBA74`'s hue angle held exactly, with
@@ -207,26 +211,21 @@ lands at **2–7% saturation** with the hue angle swinging 220° → 300° → 3
 weight moves. Setting hue, saturation and lightness independently decouples them
 — fix the angle, then place the plane.
 
-**Severity runs down the heat ramp.** Route C adds three hues, from the same
-Tailwind ramp as everything else, and with them the family's first true yellow
-and first true red:
+**The red is derived, not picked.** Route C adds exactly one hue: `#EF4444`,
+Tailwind red-500, the family's first true red. It ships as a *seed*, not as a
+value. Red-500 measures **4.33:1** on Hyperjet's elevated surface — under the
+4.5 body floor, and the accent colour is drawn on popups and menus as well as in
+the buffer. So the build holds its hue and saturation exactly and re-derives
+lightness until it clears 4.6 everywhere, which is the same operation the comment
+colour has always run:
 
-| Step | Hue | From red | Ships as |
+| | Hue | Chroma | On elevated |
 |---|---|---|---|
-| nominal | `#FDE047` yellow-300 | 50.4° | `info`, functions, `NORMAL` |
-| caution | `#FB923C` orange-400 | 27.0° | `warning`, `modified`, Helix `NORMAL` |
-| danger | `#F87171` red-400 | 0.0° | `error`, `deleted`, `REPLACE` |
+| seed `#EF4444` red-500 | 0.0° | 75.6 | 4.33:1 ✗ |
+| shipped `#F04F4F` | 0.0° | 70.8 | **4.61:1** |
 
-A status colour's meaning is readable from its hue angle before its label is.
-The gate asserts that ordering — and asserts it against the shipped file rather
-than against the constant in `src/`, so it is a statement about what installs:
-
-```
-Hyperjet heat ramp (gate: hue falls toward red, steps dE 20 apart)
-  nominal  #FDE047 -> info       50.4 deg from red
-  caution  #FB923C -> warning    27.0 deg from red
-  danger   #F87171 -> error       0.0 deg from red
-```
+Hue drift 0.00°, dE 5.5 from the seed, and 94% of red-500's chroma kept. It is
+still a vivid red; it is simply a vivid red that can be read on a menu.
 
 **The palette against the reference build.** Contrast is against each build's own
 editor ground:
@@ -235,59 +234,82 @@ editor ground:
 |---|---|---|---|---|
 | Background | `#0B0F14` | — | `#110E0B` | — |
 | Surface | `#111827` | | `#1B1611` | |
-| Panel | `#1F2937` | | `#29231C` | |
+| Panel | `#1F2937` | | `#251F18` | |
 | Muted (never text) | `#2D3748` | | `#3F362C` | |
 | Text | `#F8FAFC` | 18.37 | `#F7F2ED` | 17.30 |
 | Comment | `#728299` | 4.91 | `#9C8D7C` | 5.97 |
-| Primary — functions | `#38BDF8` | 8.97 | `#FDE047` | 14.59 |
+| **Primary — functions, focus, cursor** | `#38BDF8` | 8.97 | **`#F04F4F`** | 5.44 |
+| Signal — `info`, `renamed`, `NORMAL` | `#38BDF8` | 8.97 | `#38BDF8` | 8.98 |
 | Secondary — fields only | `#7C3AED` | 3.37 | `#7C3AED` | 3.38 |
 | Accent — keywords | `#A855F7` | 4.86 | `#A855F7` | 4.86 |
 | Type / operator | `#7DD3FC` | 11.53 | `#7DD3FC` | 11.54 |
 | String | `#6EE7B7` | 12.61 | `#6EE7B7` | 12.62 |
 | Number / constant | `#FDBA74` | 11.40 | `#FDBA74` | 11.41 |
 | Success / created | `#34D399` | 10.00 | `#34D399` | 10.01 |
-| Warning / modified | `#FBBF24` | 11.51 | `#FB923C` | 8.50 |
-| Danger / deleted | `#FB7185` | 7.14 | `#F87171` | 6.96 |
+| Warning / modified | `#FBBF24` | 11.51 | `#FBBF24` | 11.53 |
+| Danger / deleted | `#FB7185` | 7.14 | `#FB7185` | 7.15 |
 
-Four chromatic roles move — `primary`, `warning`, `danger` and the comment grey
-— and the neutral ramp with them. The rest hold: keywords are still purple, types
-still sky, strings still emerald, and `#7C3AED` is still a field colour that
-never carries text, 3.38:1 here and as unusable for a foreground as it is
-everywhere else. The family still reads as the family.
+One chromatic role moves and takes the build's identity with it. The neutral ramp
+moves with it; everything else holds, including `#7C3AED`, still a field colour
+that never carries text at 3.38:1. The family still reads as the family — it is
+lit differently, not repainted.
 
-### Three things the gates decided, not taste
+### What the red cost, and where it was paid
 
-**Keywords wanted to be red, and cannot be.** A hot red keyword is the obvious
-move for a reheat variant. But `accent` also lights the `VISUAL` chip and
-`danger` lights `REPLACE`, and rose-400 against red-400 is **dE 10.5** — under
-the 12 the gate requires between any two mode lamps. The warm band holds about
-three well-separated roles, and the status trio already has them. Keywords stayed
-purple because the gate said so, not because it was the safe choice.
+A red primary is not a hue swap. It is a colour that already means something
+everywhere else in an editor, and three things had to give.
 
-**`warning` is orange rather than amber.** Amber-400 — the core family's
-`caution` — sits **dE 17.4** from the gold, under the **20** the gate requires
-between any two version-control states: `modified` and `renamed` would have been
-too close to tell apart in the git panel. Moving `caution` one step along the
-ramp to orange-400 puts them dE 45.6 apart.
+**The panel gives up 1.5 points of lightness.** The elevated surface is the
+lightest plane the accent is drawn on, so it sets the ceiling on how deep the
+identity red can be. At the 13.5% lightness the panel wants for its own sake, the
+solver has to lift the red to `#F15757` — which lands **dE 18.9** from the alarm
+rose, under the 20 the gate requires between two version-control states. The
+panel drops to 12% so the red can keep its chroma.
 
-**`danger` is red-400 rather than red-500.** Red-500 is the truer red and it
-misses: **4.13:1** on the elevated surface, under the 4.5 body floor, because
-diagnostics are drawn on panels as well as in the buffer. Red-400 clears it at
-5.62:1. (Red-500 misses the same check on Afterburner's panel too, at 3.90:1 —
-the elevated surface is where reds get caught, and it is the one contrast tables
-usually leave out.)
+**`primary` was quietly doing two jobs.** In the core builds it is the theme's own
+colour *and* the neutral-state signal — `info` diagnostics, `version_control.renamed`,
+the `NORMAL` annunciator. Nothing exposes the conflation while the primary is
+cool. It is untenable the moment it is red: the diagnostics panel would show
+"this is fine" and "this is broken" in two reds, and the git panel would show
+`renamed` and `deleted` in two more.
+
+So those slots split off onto `signal`, and take `SWATCH.primary` — the locked
+sky-400 the core family already uses for exactly them. The identity keeps the red.
+
+**The red lamp has to be reserved for the mode that earns it.** `REPLACE` means
+you are overwriting, and it is red for that reason. With `NORMAL` also red the
+two chips measured dE 22.5 — over the gate's floor, and still wrong: the
+annunciator's whole job is being read at a glance, and two reds do not do that.
+`NORMAL` goes to `signal` with the rest of the neutral state, which lands
+Hyperjet's eight mode chips on the same eight hues Afterburner ships. Their
+separations are known-good rather than newly argued.
+
+That leaves exactly one red-on-red pair in the build — the identity and the
+alarm — and the gate names it rather than trusting it, taking both from the
+shipped file:
+
+```
+Hyperjet identity red vs alarm red (gate: dE 20, alarm the brighter)
+  identity text.accent  #f04f4f  L* 56.8
+  alarm    error        #fb7185  L* 65.0
+  dE 22.5 · alarm 8.2 L* brighter
+```
+
+The lightness condition is the half that matters. Separable is not enough for a
+pair like this: the alarm has to be the *hotter* of the two, or an error reads as
+furniture.
 
 ### The terminal does not follow the rotation
 
-ANSI is a compatibility surface, not a design surface. A theme that ships a gold
-`terminal.ansi.blue` because gold happens to be its primary breaks every program
+ANSI is a compatibility surface, not a design surface. A theme that ships a red
+`terminal.ansi.blue` because red happens to be its primary breaks every program
 that colours its own output, and the breakage looks like the program's fault.
 
-So Hyperjet supplies its own ANSI hue map, and only the two slots whose hues
-actually changed move — `red` to the new red, `yellow` to the gold. `blue` goes
-back to the locked `#38BDF8`, and `green`, `magenta` and `cyan` are byte-for-byte
-what Afterburner ships. All 24 values stay distinct, and `dim`/`normal`/`bright`
-stay dE 8 apart on every hue, checked as they are everywhere else.
+So Hyperjet supplies its own ANSI hue map. `blue` goes back to the locked
+`#38BDF8`; `red` takes the burner, which is the one slot that differs from what
+Afterburner ships; `green`, `yellow`, `magenta` and `cyan` are byte-for-byte the
+core family's. All 24 values stay distinct, and `dim`/`normal`/`bright` stay dE 8
+apart on every hue, checked as they are everywhere else.
 
 ---
 
@@ -300,7 +322,7 @@ stay dE 8 apart on every hue, checked as they are everywhere else.
 | Afterburner | 387 | 4.55:1 | 0 |
 | Stealth | 387 | 4.66:1 | 0 |
 | Contrail | 387 | 4.75:1 | 0 |
-| Hyperjet | 387 | 4.59:1 | 0 |
+| Hyperjet | 387 | 4.61:1 | 0 |
 
 Three things about this gate are not standard practice, and are the reason the
 numbers can be trusted.
@@ -377,7 +399,7 @@ So Stealth is not Afterburner with a black background:
 | Afterburner | 0.0654 | 1.00× |
 | **Stealth** | 0.0465 | **0.71×** |
 | Contrail | 0.8874 | 13.6× |
-| Hyperjet | 0.0595 | 0.91× |
+| Hyperjet | 0.0593 | 0.91× |
 
 The ratio is **0.711× under all three weightings tested** — blue-penalised, mild
 penalty, and equal weights. That insensitivity is the point: when a parameter is

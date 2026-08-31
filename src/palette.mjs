@@ -115,12 +115,22 @@ export const CONTRAIL_HUES = {
  * invented — the brief's specific worry about the mark's `#22138B` leaking
  * into the theme as a ninth colour.
  */
+/**
+ * The active line is a lighter band laid over the editor ground. Syntax sitting
+ * on it has *less* contrast than syntax on the ground, so the band is the real
+ * floor for every token in the buffer — and it is the surface the brief's
+ * contrast table never accounts for.
+ *
+ * Split out of `derive` because a variant may need it before it derives: a
+ * colour solved against the surfaces it is drawn on has to know about the band,
+ * and the band has to be the same one the build ships.
+ */
+function activeLineBand(v) {
+  return over(alpha(v.panel, v.activeLineAlpha * (v.fillScale ?? 1)), v.background);
+}
+
 function derive(v) {
-  // The active line is a lighter band laid over the editor ground. Syntax
-  // sitting on it has *less* contrast than syntax on the ground, so the band is
-  // the real floor for every token in the buffer — and it is the surface the
-  // brief's contrast table never accounts for. Both surfaces are solved here.
-  const band = over(alpha(v.panel, v.activeLineAlpha * (v.fillScale ?? 1)), v.background);
+  const band = activeLineBand(v);
   const editorSurfaces = [v.background, band];
 
   // Comments hold slate-500's hue and saturation and re-derive lightness until
@@ -271,19 +281,23 @@ export const contrail = derive({
 // ===========================================================================
 
 /**
- * Route C — Reheat. Three hues, and the first true red and true yellow in the
- * family. Same Tailwind ramp as everything else, so nothing is imported from a
- * foreign colour system.
+ * Route C — Burner. One hue, and the first true red the family has: `#EF4444`,
+ * Tailwind red-500, the same ramp everything else comes from.
  *
- * The three are not three unrelated additions: they are one idea. Severity runs
- * down the heat ramp — gold is nominal, orange is caution, red is danger — so a
- * status colour's meaning is legible from its hue angle alone, before any
- * shape or label is read. `scripts/contrast-gate.mjs` asserts that ordering.
+ * It is a seed rather than a shipped value. Red-500 measures 4.13:1 on
+ * Hyperjet's elevated surface — under the body floor, and the accent colour is
+ * drawn on popups and menus as well as in the buffer — so the build holds its
+ * hue and saturation exactly and re-derives lightness until it clears 4.6 on
+ * every surface it lands on. That is the same operation the comment colour
+ * runs, for the same reason.
+ *
+ * Rose-400 stays the alarm. Two reds in one build is the risk this variant
+ * creates and the gate names it: `scripts/contrast-gate.mjs` asserts the
+ * identity red and the alarm red are separable, and that the alarm is the
+ * brighter of the two.
  */
 export const ROUTE_C = {
-  nominal: '#FDE047', // yellow-300 — functions, info, renamed, NORMAL mode
-  caution: '#FB923C', // orange-400 — warning, modified
-  danger: '#F87171',  // red-400    — error, deleted, REPLACE mode
+  burner: '#EF4444', // red-500 — seed for the identity red
 };
 
 /**
@@ -305,6 +319,13 @@ export const ROUTE_C = {
  * Setting h, s and l independently decouples them: the angle is fixed first and
  * the plane is placed second, so every surface is warm by construction and
  * traceable to one palette hue.
+ *
+ * `panel` sits at 12% rather than the 13.5% that reads best on its own. The
+ * elevated surface is the lightest plane the accent colour is drawn on, so it
+ * sets the ceiling on how deep a red the identity can be: at 13.5% the solver
+ * has to lift the red to `#F15757`, which lands dE 18.9 from the alarm rose —
+ * under the 20 the gate requires between two version-control states. The panel
+ * gives up 1.5 points of lightness so the red can keep its chroma.
  */
 const EXHAUST_HUE = hsl(ROUTE_B.number).h;
 const plane = (s, l) => fromHsl({ h: EXHAUST_HUE, s, l }).slice(0, 7);
@@ -312,31 +333,58 @@ const plane = (s, l) => fromHsl({ h: EXHAUST_HUE, s, l }).slice(0, 7);
 export const HYPERJET_SURFACES = {
   background: plane(22, 5.5),  // editor ground — warm gunmetal, not brown
   surface: plane(21, 8.6),     // chrome
-  panel: plane(20, 13.5),      // elevated surfaces, active line
+  panel: plane(20, 12),        // elevated surfaces, active line — see above
   muted: plane(18, 21),        // borders and rules. Never text.
   text: plane(38, 95),
   textBright: plane(45, 98.5), // the emphasis pole
 };
 
+/** Held constant while the panel moved, so the band is the one already gated. */
+const HYPERJET_ACTIVE_LINE = 0.35;
+const HYPERJET_BAND = activeLineBand({
+  ...HYPERJET_SURFACES,
+  activeLineAlpha: HYPERJET_ACTIVE_LINE,
+});
+
 /**
  * Hyperjet's role assignments.
  *
- * What moves: the cool primary becomes gold, and the status trio moves onto the
- * heat ramp. What stays: keywords are still purple, types still sky, strings
- * still emerald, `#7C3AED` is still a field colour that never carries text.
- * The family reads as the family; the cockpit is simply lit by the burner
- * rather than by daylight.
+ * One role moves and takes the build's identity with it: `primary` — functions,
+ * links, focus rings, the active line number, the `NORMAL` annunciator, the
+ * local cursor — becomes the burner red. Everything the editor uses to say
+ * *here, now, you* runs red on a warm gunmetal ground.
  *
- * `number` keeps orange-300 deliberately. It is the hue the neutral ramp is
- * built from, so numerals sit in the same family as the surfaces they are drawn
- * on — and it is still dE 24.8 from caution's orange-400, comfortably clear of
- * every separation gate.
+ * What stays: keywords are still purple, types still sky, strings still
+ * emerald, numbers still orange-300 — the hue the neutral ramp is built from,
+ * so numerals sit in the same family as the surfaces they are drawn on. Warning
+ * and error keep the core family's amber and rose. `#7C3AED` is still a field
+ * colour that never carries text.
+ *
+ * `signal` is the one split this variant forces, and it is a real finding
+ * rather than a workaround. In the core builds `primary` quietly does two jobs:
+ * it is the theme's own colour *and* the neutral-state signal — `info`
+ * diagnostics, `version_control.renamed`, the `NORMAL` annunciator. Those jobs
+ * are compatible while the primary is cool and incompatible the moment it is
+ * red: the diagnostics panel would show "this is fine" and "this is broken" in
+ * two reds, the git panel would show `renamed` and `deleted` in two more, and
+ * `NORMAL` would sit next to `REPLACE` as two red lamps — in the one widget
+ * whose entire job is being read at a glance.
+ *
+ * So the neutral-state slots take `SWATCH.primary`, the locked sky-400 the core
+ * family already uses for exactly them, and the identity keeps the red. The
+ * eight mode chips end up the same eight hues Afterburner ships, which is why
+ * their separations are known-good rather than newly argued.
  */
 export const HYPERJET_HUES = {
   ...HYPERJET_SURFACES,
-  primary: ROUTE_C.nominal,
-  caution: ROUTE_C.caution,
-  danger: ROUTE_C.danger,
+  primary: solveLightness(
+    ROUTE_C.burner,
+    [HYPERJET_SURFACES.background, HYPERJET_BAND, HYPERJET_SURFACES.surface, HYPERJET_SURFACES.panel],
+    4.6,
+  ),
+  signal: SWATCH.primary,      // info, renamed, NORMAL — the locked sky-400
+  caution: ROUTE_B.caution,    // amber-400, as in the core builds
+  danger: ROUTE_B.danger,      // rose-400 — the alarm stays the family's red
   accent: SWATCH.accent,       // keywords stay purple-500
   secondary: SWATCH.secondary, // fields only, exactly as in the core builds
   go: ROUTE_B.go,
@@ -347,15 +395,16 @@ export const HYPERJET_HUES = {
 };
 
 /**
- * Hyperjet — reheat. A warm dark build for the hours the daylight variant is
- * wrong for and the OLED variant is too austere for.
+ * Hyperjet — burner lit. A warm dark build for the hours the daylight variant
+ * is wrong for and the OLED variant is too austere for, running on the red an
+ * aircraft actually lights its cockpit with at night.
  *
  * The terminal does not follow the rotation. `ansiHues` pins the six ANSI slots
- * to hues that match their names — `blue` back to the locked `#38BDF8`, `yellow`
- * to the gold, `red` to the new red — because ANSI is a compatibility surface,
- * not a design surface. A theme that ships a gold `terminal.ansi.blue` because
- * gold happens to be its primary breaks every program that colours its own
- * output, and the breakage looks like the program's fault.
+ * to hues that match their names — `blue` back to the locked `#38BDF8`, `red` to
+ * the burner — because ANSI is a compatibility surface, not a design surface. A
+ * theme that ships a red `terminal.ansi.blue` because red happens to be its
+ * primary breaks every program that colours its own output, and the breakage
+ * looks like the program's fault.
  */
 export const hyperjet = derive({
   id: 'hyperjet',
@@ -364,20 +413,17 @@ export const hyperjet = derive({
   ...HYPERJET_HUES,
   poles: { fg: HYPERJET_SURFACES.textBright, bg: HYPERJET_SURFACES.background },
   commentSeed: HYPERJET_HUES.comment,
-  // The warm panel sits closer to its ground than the cool one does, so the
-  // band needs a little more of it to read as a band at all. 0.34 is the most
-  // it can take while the purple keyword still clears the body floor on it.
-  activeLineAlpha: 0.34,
+  activeLineAlpha: HYPERJET_ACTIVE_LINE,
   punctuationAlpha: 0.52,
   lineNumberAlpha: 0.44,
   invisibleAlpha: 0.4,
   ansiBlack: HYPERJET_SURFACES.muted,
   ansiWhite: mix(HYPERJET_SURFACES.text, HYPERJET_SURFACES.background, 0.78).slice(0, 7),
   ansiHues: {
-    red: ROUTE_C.danger,
+    red: HYPERJET_HUES.primary, // the burner, where a terminal expects a red
     green: ROUTE_B.go,
-    yellow: ROUTE_C.nominal,
-    blue: SWATCH.primary, // the locked sky-400, back where a terminal expects it
+    yellow: ROUTE_B.caution,
+    blue: SWATCH.primary,       // the locked sky-400, back where it belongs
     magenta: SWATCH.accent,
     cyan: ROUTE_B.type,
   },
@@ -402,12 +448,16 @@ export const HUE_PAIRS = Object.keys(CONTRAIL_TARGETS).map((role) => [
 ]);
 
 /**
- * Hyperjet's heat ramp, in severity order. The gate asserts that hue angle
- * falls monotonically toward red as severity rises, and that no two steps
- * collapse into each other.
+ * The pair Hyperjet's design puts at risk: the identity red and the alarm red.
+ *
+ * A build whose primary is red has to prove that an error still reads as an
+ * error. The gate takes both from the shipped file — `text.accent` is always
+ * the primary, `error` always the danger — and requires them separable by the
+ * same dE 20 two version-control states owe each other, with the alarm the
+ * brighter of the two so it reads as the hotter thing on screen.
  */
-export const HEAT_RAMP = [
-  ['nominal', ROUTE_C.nominal],
-  ['caution', ROUTE_C.caution],
-  ['danger', ROUTE_C.danger],
-];
+export const RED_PAIR = {
+  identity: 'text.accent',
+  alarm: 'error',
+  floor: 20,
+};

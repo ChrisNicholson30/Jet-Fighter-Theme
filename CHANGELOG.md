@@ -14,12 +14,17 @@ First release. Four variants in one theme family.
   modelled drive cost under every weighting tested.
 - **Jet Fighter Contrail** — light, for daylight legibility.
 - **Jet Fighter Hyperjet** — the first *special* variant: a warm dark build on a
-  ground hue-locked to the palette's own orange, with the status trio moved onto
-  a heat ramp (gold nominal, orange caution, red danger). Special variants may
-  reassign which hue plays which role; they are held to every gate the core
-  three are. Adds **Route C**: `#FDE047`, `#FB923C` and `#F87171` — the family's
-  first true yellow and true red — from the same Tailwind ramp as the rest of
-  the palette.
+  ground hue-locked to the palette's own orange, with a vivid red identity.
+  Special variants may reassign which hue plays which role; they are held to
+  every gate the core three are. Adds **Route C**: `#EF4444`, Tailwind red-500
+  and the family's first true red, seeded rather than shipped — the build holds
+  its hue and saturation and re-derives lightness to `#F04F4F` so the accent
+  clears the body floor on the elevated surface too.
+- A **`signal` role**, splitting the neutral-state slots (`info`,
+  `version_control.renamed`, the `NORMAL` annunciator) off from `primary`. The
+  two are the same colour in every core build and cannot be once the primary is
+  red — `info` beside `error` and `NORMAL` beside `REPLACE` would each be two
+  reds. Defaults to `primary`, so the core three are unchanged.
 - An **ANSI hue map** a variant can override, so a build that reassigns roles
   keeps a terminal whose `blue` is blue. The core three do not set it and their
   output is unchanged.
@@ -45,8 +50,9 @@ First release. Four variants in one theme family.
   token against the worst surface it is drawn on (including the active-line
   band), and holds recessive tokens to a named lower floor rather than
   exempting them. Ships with a self-test that proves it rejects a known-bad
-  colour. Also asserts Hyperjet's heat ramp against the shipped file: severity
-  must fall toward red in hue, and no two steps may collapse.
+  colour. Also asserts, against the shipped file, that Hyperjet's identity red
+  and alarm red stay dE 20 apart and that the alarm is the brighter of the two —
+  the one red-on-red pair a red-primary build leaves behind.
 - `scripts/key-coverage.mjs` — checks against the key inventory extracted from
   the Zed source, not against One Dark.
 - `scripts/provenance.mjs` — proves every colour in the shipped file traces to

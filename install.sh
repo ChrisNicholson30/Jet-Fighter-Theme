@@ -84,7 +84,7 @@ variants() {
   say "  ${DIM}Afterburner${R}  dark      the reference build"
   say "  ${DIM}Stealth${R}      OLED      true black, 0.71x the modelled draw"
   say "  ${DIM}Contrail${R}     light     daylight legibility"
-  say "  ${DIM}Hyperjet${R}     special   warm dark, on the heat ramp"
+  say "  ${DIM}Hyperjet${R}     special   warm dark, burner red"
 }
 
 # ---------------------------------------------------------------------- main
